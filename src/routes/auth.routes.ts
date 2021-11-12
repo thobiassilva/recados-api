@@ -10,6 +10,14 @@ interface AuthParams {
   password: string;
 }
 
+routes.get("/", (req: Request, res: Response) => {
+  try {
+    return res.status(200).send({ success: true, message: "Server ON" });
+  } catch (error) {
+    return res.status(500).send({ success: false, message: "Erro interno" });
+  }
+});
+
 routes.post("/login", (req: Request, res: Response) => {
   try {
     const authParams: AuthParams = req.body;
