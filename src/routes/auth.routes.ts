@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import { v4 as uuid } from "uuid";
-import { usersList } from "./database";
-import User from "./entities/user.entity";
+import { usersList } from "../database";
+import User from "../entities/user.entity";
 
 export const routes = express.Router();
 
@@ -9,16 +9,6 @@ interface AuthParams {
   login: string;
   password: string;
 }
-
-routes.get("/", (req: Request, res: Response) => {
-  try {
-    return res
-      .status(200)
-      .send({ success: true, data: usersList, message: "Sucesso" });
-  } catch (error) {
-    return res.status(500).send({ success: false, message: "Erro interno" });
-  }
-});
 
 routes.post("/login", (req: Request, res: Response) => {
   try {
