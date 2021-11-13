@@ -13,4 +13,4 @@ app.use(routes);
 app.use(authorizationValid);
 app.use("/messages", messageRoutes);
 
-app.listen(process.env.PORT || 8081, () => console.log("Server ON"));
+app.listen(process.env.PORT || 8082, () => console.log("Server ON"));
