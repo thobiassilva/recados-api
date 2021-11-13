@@ -60,6 +60,19 @@ routes.post("/register", (req: Request, res: Response) => {
         .send({ success: false, message: "Dados não informados." });
     }
 
+    let userAlreadyRegistered = usersList.find(
+      (u) => u.login === authParams.login
+    );
+
+    if (userAlreadyRegistered) {
+      return res
+        .status(400)
+        .send({
+          success: false,
+          message: "Usuário já registrado. Tente outro username ou faça login.",
+        });
+    }
+
     const user = new User(uuid(), authParams.login, authParams.password);
 
     usersList.push(user);
