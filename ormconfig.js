@@ -1,12 +1,16 @@
 require('dotenv').config();
 
+const eProducao = process.env.NODE_ENV?.toLocaleLowerCase() === 'production';
+
+const pastaRaiz = eProducao ? 'dist' : 'src';
+
 module.exports = {
     type: "postgres",
     url: process.env.DATABASE_URL,
     synchronize: false,
     logging: false,
-    entities: ['src/database/entities/**/*.ts'],
-    migrations: ['src/database/migrations/**/*.ts'],
+    entities: [pastaRaiz + '/database/entities/**/*'],
+    migrations: [pastaRaiz + '/database/migrations/**/*'],
     cli: {
         entitiesDir: 'src/database/entities',
         migrationsDir: 'src/database/migrations',
