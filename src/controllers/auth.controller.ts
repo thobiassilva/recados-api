@@ -1,76 +1,84 @@
-import express, { Request, Response } from "express";
-import { usersList } from "../database";
 import { v4 as uuid } from "uuid";
-import User from "../entities/user.entity";
-
-interface AuthParams {
-  login: string;
-  password: string;
-}
+import { Connection, Repository } from "typeorm";
+import { getConnection } from "../database/connection";
+import { User } from "../database/entities/user.entity";
+import { AuthParams, HttpResponse } from "../utils/interfaces";
 
 export class AuthController {
-  static async login(req: Request, res: Response) {
-    try {
-      const authParams: AuthParams = req.body;
+  private readonly connection: Connection;
+  private readonly repository: Repository<User>;
 
-      if (!authParams.login || !authParams.password) {
-        return res
-          .status(400)
-          .send({ success: false, message: "Dados não informados." });
-      }
-
-      let user = usersList.find((u) => u.login === authParams.login);
-
-      if (!user) {
-        return res
-          .status(404)
-          .send({ success: false, message: "Usuário não encontrado" });
-      }
-
-      if (user!.password !== authParams.password) {
-        return res
-          .status(400)
-          .send({ success: false, message: "Senha inválida" });
-      }
-
-      return res
-        .status(200)
-        .send({ success: true, data: user!.uid, message: "Sucesso" });
-    } catch (error) {
-      return res.status(500).send({ success: false, message: "Erro interno" });
-    }
+  constructor() {
+    this.connection = getConnection();
+    this.repository = this.connection.getRepository(User);
   }
 
-  static async register(req: Request, res: Response) {
-    try {
-      const authParams: AuthParams = req.body;
+  async login(authParams: AuthParams): Promise<HttpResponse> {
+    if (!authParams.login || !authParams.password) {
+      return {
+        statusCode: 400,
+        body: { success: false, message: "Dados não informados." },
+      };
+    }
 
-      if (!authParams.login || !authParams.password) {
-        return res
-          .status(400)
-          .send({ success: false, message: "Dados não informados." });
-      }
+    const users = await this.repository.find({
+      where: { login: authParams.login },
+    });
 
-      let userAlreadyRegistered = usersList.find(
-        (u) => u.login === authParams.login
-      );
+    if (users.length <= 0) {
+      return {
+        statusCode: 404,
+        body: { success: false, message: "Usuário não encontrado" },
+      };
+    }
 
-      if (userAlreadyRegistered) {
-        return res.status(400).send({
+    const user = users.find((u) => u.password === authParams.password);
+
+    if (!user) {
+      return {
+        statusCode: 400,
+        body: { success: false, message: "Senha inválida" },
+      };
+    }
+
+    return {
+      body: { success: true, data: user!.uid, message: "Sucesso" },
+      statusCode: 200,
+    };
+  }
+
+  async register(authParams: AuthParams): Promise<HttpResponse> {
+    if (!authParams.login || !authParams.password) {
+      return {
+        statusCode: 400,
+        body: { success: false, message: "Dados não informados." },
+      };
+    }
+
+    let userAlreadyRegistered = await this.repository.find({
+      where: { login: authParams.login },
+    });
+
+    if (userAlreadyRegistered.length > 0) {
+      return {
+        statusCode: 400,
+        body: {
           success: false,
           message: "Usuário já registrado. Tente outro username ou faça login.",
-        });
-      }
-
-      const user = new User(uuid(), authParams.login, authParams.password);
-
-      usersList.push(user);
-
-      return res
-        .status(200)
-        .send({ success: true, data: user!.uid, message: "Sucesso" });
-    } catch (error) {
-      return res.status(500).send({ success: false, message: "Erro interno" });
+        },
+      };
     }
+
+    const user = new User();
+    user.uid = uuid();
+    user.login = authParams.login;
+    user.password = authParams.password;
+
+    await this.repository.save(user);
+
+    return {
+      body: { success: true, data: user!.uid, message: "Sucesso" },
+      statusCode: 200,
+    };
   }
 }

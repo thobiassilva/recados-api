@@ -1,11 +1,29 @@
 import express, { Request, Response } from "express";
-import { v4 as uuid } from "uuid";
 import { AuthController } from "../controllers/auth.controller";
-import { usersList } from "../database";
-import User from "../entities/user.entity";
+import { AuthParams } from "../utils/interfaces";
 
 export const routes = express.Router();
 
-routes.post("/login", AuthController.login);
+routes.post("/login", async (req: Request, res: Response) => {
+  try {
+    const authParams: AuthParams = req.body;
 
-routes.post("/register", AuthController.register);
+    const result = await new AuthController().login(authParams);
+
+    return res.status(result.statusCode).send(result.body);
+  } catch (error) {
+    return res.status(500).send({ success: false, message: "Erro interno" });
+  }
+});
+
+routes.post("/register", async (req: Request, res: Response) => {
+  try {
+    const authParams: AuthParams = req.body;
+
+    const result = await new AuthController().register(authParams);
+
+    return res.status(result.statusCode).send(result.body);
+  } catch (error) {
+    return res.status(500).send({ success: false, message: "Erro interno" });
+  }
+});

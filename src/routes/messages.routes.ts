@@ -1,15 +1,70 @@
 import express, { Request, Response } from "express";
-import { v4 as uuid } from "uuid";
 import { MessageController } from "../controllers/message.controllers";
-import { messagesList } from "../database";
-import Message from "../entities/message.entity";
+import { AuthParams, HttpResponse, MessageParams } from "../utils/interfaces";
 
 export const messageRoutes = express.Router();
 
-messageRoutes.get("/", MessageController.getMessages);
+messageRoutes.get("/", async (req: Request, res: Response) => {
+  try {
+    const userUid = req.headers.authorization!;
 
-messageRoutes.post("/", MessageController.createMessage);
+    const result = await new MessageController().getMessages(userUid);
 
-messageRoutes.put("/:uid", MessageController.editMessage);
+    return res.status(result.statusCode).send(result.body);
+  } catch (error) {
+    console.log({ error });
+    return res.status(500).send({ success: false, message: "Erro interno" });
+  }
+});
 
-messageRoutes.delete("/:uid", MessageController.deleteMessage);
+messageRoutes.post("/", async (req: Request, res: Response) => {
+  try {
+    const userUid = req.headers.authorization!;
+
+    const messageParams: MessageParams = req.body;
+
+    const result = await new MessageController().createMessage(
+      userUid,
+      messageParams
+    );
+
+    return res.status(result.statusCode).send(result.body);
+  } catch (error) {
+    console.log({ error });
+    return res.status(500).send({ success: false, message: "Erro interno" });
+  }
+});
+
+messageRoutes.put("/:uid", async (req: Request, res: Response) => {
+  try {
+    const userUid = req.headers.authorization!;
+    const messageParams: MessageParams = req.body;
+    const messageUid: string = req.params.uid;
+
+    const result = await new MessageController().editMessage(
+      userUid,
+      messageParams,
+      messageUid
+    );
+
+    return res.status(result.statusCode).send(result.body);
+  } catch (error) {
+    return res.status(500).send({ success: false, message: "Erro interno" });
+  }
+});
+
+messageRoutes.delete("/:uid", async (req: Request, res: Response) => {
+  try {
+    const userUid = req.headers.authorization!;
+    const messageUid: string = req.params.uid;
+
+    const result = await new MessageController().deleteMessage(
+      userUid,
+      messageUid
+    );
+
+    return res.status(result.statusCode).send(result.body);
+  } catch (error) {
+    return res.status(500).send({ success: false, message: "Erro interno" });
+  }
+});

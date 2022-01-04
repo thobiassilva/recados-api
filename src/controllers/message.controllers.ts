@@ -1,136 +1,119 @@
-import { Request, Response } from "express";
+import { Connection, Repository } from "typeorm";
 import { v4 as uuid } from "uuid";
-import { messagesList } from "../database";
-import Message from "../entities/message.entity";
-
-interface MessageParams {
-  title: string;
-  detail: string;
-}
+import { getConnection } from "../database/connection";
+import { Message } from "../database/entities/message.entity";
+import { HttpResponse, MessageParams } from "../utils/interfaces";
 
 export class MessageController {
-  static async getMessages(req: Request, res: Response) {
-    try {
-      const userUid = req.headers.authorization;
-      const userMessages = messagesList.filter(
-        (message) => message.userUid == userUid
-      );
-      return res
-        .status(200)
-        .send({ success: true, data: userMessages, message: "Sucesso" });
-    } catch (error) {
-      return res.status(500).send({ success: false, message: "Erro interno" });
-    }
+  private readonly connection: Connection;
+  private readonly repository: Repository<Message>;
+
+  constructor() {
+    this.connection = getConnection();
+    this.repository = this.connection.getRepository(Message);
   }
 
-  static async createMessage(req: Request, res: Response) {
-    try {
-      const userUid = req.headers.authorization!;
-      const messageParams: MessageParams = req.body;
-
-      if (!messageParams.title || !messageParams.detail) {
-        return res
-          .status(400)
-          .send({ success: false, message: "Dados não informados." });
-      }
-
-      const message = new Message(
-        uuid(),
-        messageParams.title,
-        messageParams.detail,
-        userUid
-      );
-
-      messagesList.push(message);
-
-      return res
-        .status(200)
-        .send({ success: true, data: message, message: "Sucesso" });
-    } catch (error) {
-      return res.status(500).send({ success: false, message: "Erro interno" });
-    }
+  async getMessages(uid: string): Promise<HttpResponse> {
+    const messages = await this.repository.find({ where: { userUid: uid } });
+    return {
+      statusCode: 200,
+      body: { success: true, data: messages, message: "Sucesso" },
+    };
   }
 
-  static async editMessage(req: Request, res: Response) {
-    try {
-      const userUid: string = req.headers.authorization!;
-      const messageParams: MessageParams = req.body;
-      const messageUid: string = req.params.uid;
-
-      if (!messageUid) {
-        return res
-          .status(400)
-          .send({ success: false, message: "Uid não informado." });
-      }
-
-      if (!messageParams.title || !messageParams.detail) {
-        return res
-          .status(400)
-          .send({ success: false, message: "Dados não informados." });
-      }
-
-      const userMessages = messagesList.filter((m) => m.userUid === userUid);
-
-      if (userMessages.length <= 0) {
-        return res
-          .status(404)
-          .send({ success: false, message: "Mensagem nao encontrada" });
-      }
-
-      const index = userMessages.findIndex((m) => m.uid === messageUid);
-
-      if (index < 0) {
-        return res
-          .status(404)
-          .send({ success: false, message: "Mensagem nao encontrada" });
-      }
-
-      messagesList[index].title = messageParams.title;
-      messagesList[index].detail = messageParams.detail;
-
-      return res
-        .status(200)
-        .send({ success: true, data: messagesList[index], message: "Sucesso" });
-    } catch (error) {
-      return res.status(500).send({ success: false, message: "Erro interno" });
+  async createMessage(
+    userUid: string,
+    messageParams: MessageParams
+  ): Promise<HttpResponse> {
+    if (!messageParams.title || !messageParams.detail) {
+      return {
+        statusCode: 400,
+        body: { success: false, message: "Dados não informados." },
+      };
     }
+
+    const message = new Message();
+    message.uid = uuid();
+    message.title = messageParams.title;
+    message.detail = messageParams.detail;
+    message.userUid = userUid;
+
+    await this.repository.save(message);
+
+    return {
+      statusCode: 200,
+      body: { success: true, data: message, message: "Sucesso" },
+    };
   }
 
-  static async deleteMessage(req: Request, res: Response) {
-    try {
-      const userUid: string = req.headers.authorization!;
-      const messageUid: string = req.params.uid;
-
-      if (!messageUid) {
-        return res
-          .status(400)
-          .send({ success: false, message: "Uid não informado." });
-      }
-
-      const userMessages = messagesList.filter((m) => m.userUid === userUid);
-
-      if (userMessages.length <= 0) {
-        return res
-          .status(404)
-          .send({ success: false, message: "Mensagem nao encontrada" });
-      }
-
-      const index = userMessages.findIndex((m) => m.uid === messageUid);
-
-      if (index < 0) {
-        return res
-          .status(404)
-          .send({ success: false, message: "Mensagem nao encontrada" });
-      }
-
-      messagesList.splice(index, 1);
-
-      return res.status(200).send({
-        success: true,
-        message: "Sucesso",
-      });
-    } catch (error) {
-      return res.status(500).send({ success: false, message: "Erro interno" });
+  async editMessage(
+    userUid: string,
+    messageParams: MessageParams,
+    messageUid?: string
+  ): Promise<HttpResponse> {
+    if (!messageUid) {
+      return {
+        statusCode: 400,
+        body: { success: false, message: "Uid não informado." },
+      };
     }
+
+    if (!messageParams.title || !messageParams.detail) {
+      return {
+        statusCode: 400,
+        body: { success: false, message: "Dados não informados." },
+      };
+    }
+
+    const message = await this.repository.find({
+      where: { uid: messageUid, userUid: userUid },
+    });
+
+    if (message.length <= 0) {
+      return {
+        statusCode: 404,
+        body: { success: false, message: "Mensagem nao encontrada" },
+      };
+    }
+
+    message[0].title = messageParams.title;
+    message[0].detail = messageParams.detail;
+
+    await this.repository.save(message[0]);
+
+    return {
+      statusCode: 200,
+      body: { success: true, data: message[0], message: "Sucesso" },
+    };
+  }
+
+  async deleteMessage(
+    userUid: string,
+    messageUid: string
+  ): Promise<HttpResponse> {
+    if (!messageUid) {
+      return {
+        statusCode: 400,
+        body: { success: false, message: "Uid não informado." },
+      };
+    }
+
+    const message = await this.repository.find({
+      where: { uid: messageUid, userUid: userUid },
+    });
+
+    if (message.length <= 0) {
+      return {
+        statusCode: 404,
+        body: { success: false, message: "Mensagem nao encontrada" },
+      };
+    }
+
+    await this.repository.delete({ uid: messageUid });
+
+    return {
+      statusCode: 200,
+      body: { success: true, message: "Sucesso" },
+    };
   }
 }
