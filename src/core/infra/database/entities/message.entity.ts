@@ -5,9 +5,10 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { IMessage } from "../../../../features/messages/domain/models/mesage.model";
 
 @Entity()
-export class Message {
+export class Message implements IMessage {
   @PrimaryColumn({
     type: "uuid",
   })

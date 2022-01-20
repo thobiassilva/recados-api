@@ -5,9 +5,10 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { IUser } from "../../../domain/models/user.model";
 
 @Entity()
-export class User {
+export class User implements IUser {
   @PrimaryColumn({ type: "uuid" })
   uid!: string;
 
