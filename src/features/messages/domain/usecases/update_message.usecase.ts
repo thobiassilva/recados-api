@@ -1,5 +1,7 @@
 import { IUseCase } from "../../../../core/domain/contracts/usecase.contract";
+import { NotFoundFailure } from "../../../../core/domain/errors/errors";
 import { IMessageRepository } from "../contracts/message_repository.contract";
+import { UpdateMessageFailure } from "../errors/errors";
 import { IMessage } from "../models/mesage.model";
 import { UpdateMessageParams } from "../models/update_message.params";
 
@@ -10,8 +12,7 @@ export class UpdateMessageUseCase implements IUseCase {
     const message = await this.repository.find(params.uid);
 
     if (!message) {
-      //  notFound
-      throw new Error();
+      throw new NotFoundFailure("Mensagem");
     }
 
     const data = {
@@ -24,7 +25,7 @@ export class UpdateMessageUseCase implements IUseCase {
     const result = await this.repository.update(data);
 
     if (!result) {
-      throw new Error("");
+      throw new UpdateMessageFailure();
     }
 
     return data;

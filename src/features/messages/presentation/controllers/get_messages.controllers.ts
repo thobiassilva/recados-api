@@ -17,7 +17,7 @@ export class GetMessagesController implements IController {
 
       return ok(res, result);
     } catch (error) {
-      serverError(res, error);
+      return serverError(res, error);
     }
   }
 }

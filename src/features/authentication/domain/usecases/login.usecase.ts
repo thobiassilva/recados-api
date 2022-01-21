@@ -1,6 +1,8 @@
 import { IUseCase } from "../../../../core/domain/contracts/usecase.contract";
 import { IUserRepository } from "../../../../core/domain/contracts/user_repository.contract";
+import { NotFoundFailure } from "../../../../core/domain/errors/errors";
 import { IUser } from "../../../../core/domain/models/user.model";
+import { InvalidCredentialsFailure } from "../errors/errors";
 import { LoginParams } from "../models/login.params";
 
 export class LoginUseCase implements IUseCase {
@@ -10,8 +12,7 @@ export class LoginUseCase implements IUseCase {
     const user: IUser | undefined = await this.repository.find(params.login);
 
     if (!user) {
-      //  throw new NotFoundError("User");
-      throw new Error();
+      throw new NotFoundFailure("User");
     }
 
     //   const passwordMatches = Cryptography.compare(
@@ -22,8 +23,7 @@ export class LoginUseCase implements IUseCase {
     const passwordMatches = params.password === user.password;
 
     if (!passwordMatches) {
-      // throw new InvalidCredentialsError();
-      throw new Error();
+      throw new InvalidCredentialsFailure();
     }
 
     return user;

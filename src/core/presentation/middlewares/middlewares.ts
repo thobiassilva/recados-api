@@ -1,4 +1,6 @@
 import { NextFunction, Request, Response } from "express";
+import { InvalidTokenFailure } from "../../domain/errors/errors";
+import { serverError } from "../helpers/http_handler";
 
 export const authorizationValid = (
   req: Request,
@@ -6,7 +8,7 @@ export const authorizationValid = (
   next: NextFunction
 ) => {
   if (!req.headers.authorization) {
-    return res.status(400).send({ message: "Não foi informado o token" });
+    serverError(res, new InvalidTokenFailure());
   }
   next();
 };

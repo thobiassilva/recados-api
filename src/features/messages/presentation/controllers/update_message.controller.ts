@@ -17,7 +17,7 @@ export class UpdateMessageController implements IController {
       const uid = req.params.uid;
 
       if (!title || !detail) {
-        badRequest(res, "Dados não informados.");
+        return badRequest(res, "Dados não informados.");
       }
 
       const result = await this.usecase.execute({
@@ -29,7 +29,7 @@ export class UpdateMessageController implements IController {
 
       return ok(res, result);
     } catch (error) {
-      serverError(res, error);
+      return serverError(res, error);
     }
   }
 }

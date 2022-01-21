@@ -16,14 +16,14 @@ export class CreateMessageController implements IController {
       const { title, detail } = req.body;
 
       if (!title || !detail) {
-        badRequest(res, "Dados não informados.");
+        return badRequest(res, "Dados não informados.");
       }
 
       const result = await this.usecase.execute({ title, detail, userUid });
 
       return ok(res, result);
     } catch (error) {
-      serverError(res, error);
+      return serverError(res, error);
     }
   }
 }

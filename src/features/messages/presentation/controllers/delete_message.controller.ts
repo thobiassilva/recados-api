@@ -18,7 +18,7 @@ export class DeleteMessageController implements IController {
 
       return ok(res, {});
     } catch (error) {
-      serverError(res, error);
+      return serverError(res, error);
     }
   }
 }
