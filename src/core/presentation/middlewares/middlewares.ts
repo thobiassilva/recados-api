@@ -8,7 +8,7 @@ export const authorizationValid = (
   next: NextFunction
 ) => {
   if (!req.headers.authorization) {
-    serverError(res, new InvalidTokenFailure());
+    return serverError(res, new InvalidTokenFailure());
   }
   next();
 };
