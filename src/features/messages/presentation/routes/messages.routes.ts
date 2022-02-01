@@ -1,4 +1,5 @@
 import { Request, Response, Router } from "express";
+import { CacheRepository } from "../../../../core/infra/repositories/cache.repository";
 import { CreateMessageUseCase } from "../../domain/usecases/create_message.usecase";
 import { DeleteMessageUseCase } from "../../domain/usecases/delete_message.usecase";
 import { GetMessagesUseCase } from "../../domain/usecases/get_messages.usecase";
@@ -14,11 +15,24 @@ export class MessageRouter {
     const routes = Router();
 
     const messageRepository = new MessageRepository();
+    const cacheRepository = new CacheRepository();
 
-    const getMessagesUseCase = new GetMessagesUseCase(messageRepository);
-    const createMessageUseCase = new CreateMessageUseCase(messageRepository);
-    const updateMessageUseCase = new UpdateMessageUseCase(messageRepository);
-    const deleteMessageUseCase = new DeleteMessageUseCase(messageRepository);
+    const getMessagesUseCase = new GetMessagesUseCase(
+      messageRepository,
+      cacheRepository
+    );
+    const createMessageUseCase = new CreateMessageUseCase(
+      messageRepository,
+      cacheRepository
+    );
+    const updateMessageUseCase = new UpdateMessageUseCase(
+      messageRepository,
+      cacheRepository
+    );
+    const deleteMessageUseCase = new DeleteMessageUseCase(
+      messageRepository,
+      cacheRepository
+    );
 
     const getMessagesController = new GetMessagesController(getMessagesUseCase);
     const createMessageController = new CreateMessageController(
