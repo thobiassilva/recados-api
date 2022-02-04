@@ -7,6 +7,7 @@
     "dev": "ts-node-dev --respawn --transpile-only ./src/main.ts",
     "postinstall": "npx tsc",
     "start": "node ./dist/main.js",
+    "teste": "node ./dist/teste.js",
     "migration:run": "yarn ts-node-dev ./node_modules/typeorm/cli.js migration:run",
     "migration:generate": "yarn ts-node-dev ./node_modules/typeorm/cli.js migration:generate"
   },
