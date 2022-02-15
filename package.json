@@ -13,8 +13,8 @@
     "test:setup": "yarn rimraf testdb.sqlite && rimraf ./tests/core/infra/database/migrations && cross-env NODE_ENV=test yarn migration:generate -- -n TestsMigration && cross-env NODE_ENV=test yarn migration:run",
     "test": "yarn test:setup && cross-env NODE_ENV=test jest --detectOpenHandles --passWithNoTests --silent --noStackTrace --runInBand",
     "test:verbose": "yarn test:setup && cross-env NODE_ENV=test jest --passWithNoTests --runInBand",
-    "test:unit": "yarn test:verbose --watch -c jest-unit.config.js",
-    "test:integration": "yarn test:verbose --watch -c jest-integration.config.js",
+    "test:unit": "yarn test:verbose --watch -c jest.unit.config.ts",
+    "test:integration": "yarn test:verbose --watch -c jest.integration.config.ts",
     "test:ci": "yarn test --coverage"
   },
   "devDependencies": {
@@ -27,7 +27,9 @@
     "@types/uuid": "^8.3.1",
     "cross-env": "^7.0.3",
     "jest": "^27.5.1",
+    "rimraf": "^3.0.2",
     "sqlite3": "^5.0.2",
+    "supertest": "^6.2.2",
     "ts-jest": "^27.1.3",
     "ts-node-dev": "^1.1.8",
     "typescript": "^4.4.4"

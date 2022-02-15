@@ -1,5 +1,5 @@
-import config from "./jest.config";
+import jestConfig from "./jest.config";
 
-config.testMatch = ["**/*.spec.ts"];
+const config = { ...jestConfig, testMatch: ["**/*.spec.ts"] };
 
 export default config;
