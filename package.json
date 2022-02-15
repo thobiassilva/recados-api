@@ -6,10 +6,16 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only ./src/main.ts",
     "postinstall": "npx tsc",
-    "start": "node ./dist/main.js",
-    "teste": "node ./dist/teste.js",
+    "start": "cross-env NODE_ENV=production node ./dist/main.js",
+    "build": "yarn rimraf dist && yarn tsc",
     "migration:run": "yarn ts-node-dev ./node_modules/typeorm/cli.js migration:run",
-    "migration:generate": "yarn ts-node-dev ./node_modules/typeorm/cli.js migration:generate"
+    "migration:generate": "yarn ts-node-dev ./node_modules/typeorm/cli.js migration:generate",
+    "test:setup": "yarn rimraf testdb.sqlite && rimraf ./tests/core/infra/database/migrations && cross-env NODE_ENV=test yarn migration:generate -- -n TestsMigration && cross-env NODE_ENV=test yarn migration:run",
+    "test": "yarn test:setup && cross-env NODE_ENV=test jest --detectOpenHandles --passWithNoTests --silent --noStackTrace --runInBand",
+    "test:verbose": "yarn test:setup && cross-env NODE_ENV=test jest --passWithNoTests --runInBand",
+    "test:unit": "yarn test:verbose --watch -c jest-unit.config.js",
+    "test:integration": "yarn test:verbose --watch -c jest-integration.config.js",
+    "test:ci": "yarn test --coverage"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
