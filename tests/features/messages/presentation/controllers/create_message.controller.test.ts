@@ -2,7 +2,10 @@ import request from "supertest";
 import { DatabaseConnection } from "../../../../../src/core/infra/database/connections/connection";
 import { RedisConnection } from "../../../../../src/core/infra/database/connections/redis";
 import { User } from "../../../../../src/core/infra/database/entities/user.entity";
-import { UserEntityBuilder } from "../../../../core/infra/database/entities/user_entity.builder";
+import {
+  UserEntityBuilder,
+  MessageEntityBuilder,
+} from "../../../../core/infra/database/entities";
 import { createServer } from "../../../../../src/core/presentation/server/server";
 
 const makeUser = async () => {
@@ -10,7 +13,12 @@ const makeUser = async () => {
   return { user };
 };
 
-describe("LoginController", () => {
+const makeMessage = async () => {
+  const message = await MessageEntityBuilder.init().builder();
+  return { message };
+};
+
+describe("CreateMessageController", () => {
   let app: Express.Application | undefined = undefined;
 
   beforeAll(async () => {
@@ -25,32 +33,31 @@ describe("LoginController", () => {
     RedisConnection.closeConnection();
   });
 
-  test("Deve retornar Bad Request (400) se nao informar os dados ", async () => {
-    await request(app).post("/login").send().expect(400);
+  test("Deve retornar Forbidden (403) se nao informar o authorization ", async () => {
+    await request(app).post("/message/").send().expect(403);
   });
 
-  test("Deve retornar Not Found (404) se nao encontrar o usuario ", async () => {
-    await makeUser();
+  test("Deve retornar Bad Request (400) se nao informar os dados ", async () => {
+    const { user } = await makeUser();
     await request(app)
-      .post("/login")
-      .send({
-        login: "any_user_login",
-        password: "any_user_password",
-      })
-      .expect(404);
+      .post("/message/")
+      .send()
+      .set({ authorization: user.uid })
+      .expect(400);
   });
 
   test("Deve retornar um ok", async () => {
     const { user } = await makeUser();
     await request(app)
-      .post("/login")
+      .post("/message/")
+      .set({ authorization: user.uid })
       .send({
-        login: user.login,
-        password: user.password,
+        title: "any_title",
+        detail: "any_detail",
       })
       .expect(200)
       .expect((response) => {
-        expect(response.body.data).toEqual(user.uid);
+        expect(response.body.data).toBeTruthy();
       });
   });
 });

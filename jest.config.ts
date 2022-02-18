@@ -29,7 +29,7 @@ export default {
   coveragePathIgnorePatterns: [
     "\\\\node_modules\\\\",
     "<rootDir>/src/core/infra/data/database/migrations",
-    "<rootDir>/tests/core/infra/data/database/",
+    "<rootDir>/tests/core/infra/data/database",
     "<rootDir>/src/main",
   ],
 
@@ -146,7 +146,7 @@ export default {
   // testLocationInResults: false,
 
   // The glob patterns Jest uses to detect test files
-  testMatch: [],
+  testMatch: ["**/*.spec.ts", "**/*.test.ts"],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   // testPathIgnorePatterns: [

@@ -10,7 +10,7 @@ const makeUser = async () => {
   return { user };
 };
 
-describe("LoginController", () => {
+describe("RegisterController", () => {
   let app: Express.Application | undefined = undefined;
 
   beforeAll(async () => {
@@ -26,31 +26,30 @@ describe("LoginController", () => {
   });
 
   test("Deve retornar Bad Request (400) se nao informar os dados ", async () => {
-    await request(app).post("/login").send().expect(400);
+    await request(app).post("/register").send().expect(400);
   });
 
-  test("Deve retornar Not Found (404) se nao encontrar o usuario ", async () => {
-    await makeUser();
-    await request(app)
-      .post("/login")
-      .send({
-        login: "any_user_login",
-        password: "any_user_password",
-      })
-      .expect(404);
-  });
-
-  test("Deve retornar um ok", async () => {
+  test("Deve retornar Bad Request (400) se o usuario ja existir", async () => {
     const { user } = await makeUser();
     await request(app)
-      .post("/login")
+      .post("/register")
       .send({
         login: user.login,
         password: user.password,
       })
+      .expect(400);
+  });
+
+  test("Deve retornar um ok", async () => {
+    await request(app)
+      .post("/register")
+      .send({
+        login: "new_user_login",
+        password: "new_user_password",
+      })
       .expect(200)
       .expect((response) => {
-        expect(response.body.data).toEqual(user.uid);
+        expect(response.body.data).toBeTruthy();
       });
   });
 });

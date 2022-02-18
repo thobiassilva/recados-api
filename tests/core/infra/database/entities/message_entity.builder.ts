@@ -1,6 +1,6 @@
-import { DatabaseConnection } from "../../src/core/infra/database/connections/connection";
-import { Message } from "../../src/core/infra/database/entities/message.entity";
-import { IMessage } from "../../src/features/messages/domain/models/message.model";
+import { DatabaseConnection } from "../../../../../src/core/infra/database/connections/connection";
+import { Message } from "../../../../../src/core/infra/database/entities/message.entity";
+import { IMessage } from "../../../../../src/features/messages/domain/models/message.model";
 
 export class MessageEntityBuilder {
   #uid = "any_uid";
