@@ -29,6 +29,7 @@ export default {
   coveragePathIgnorePatterns: [
     "\\\\node_modules\\\\",
     "<rootDir>/src/core/infra/data/database/migrations",
+    "<rootDir>/tests/core/infra/data/database/",
     "<rootDir>/src/main",
   ],
 

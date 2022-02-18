@@ -2,7 +2,7 @@ import { Repository } from "typeorm";
 import { DatabaseConnection } from "../../../../core/infra/database/connections/connection";
 import { Message } from "../../../../core/infra/database/entities/message.entity";
 import { IMessageRepository } from "../../domain/contracts/message_repository.contract";
-import { IMessage } from "../../domain/models/mesage.model";
+import { IMessage } from "../../domain/models/message.model";
 
 export class MessageRepository implements IMessageRepository {
   private repository: Repository<Message>;

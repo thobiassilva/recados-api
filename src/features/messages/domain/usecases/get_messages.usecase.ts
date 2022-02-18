@@ -1,12 +1,12 @@
 import { ICacheRepository } from "../../../../core/domain/contracts/cache_repository.contract";
 import { IUseCase } from "../../../../core/domain/contracts/usecase.contract";
-import { MessageRepository } from "../../infra/repositories/message.repository";
-import { IMessage } from "../models/mesage.model";
+import { IMessageRepository } from "../contracts/message_repository.contract";
+import { IMessage } from "../models/message.model";
 import { UidParams } from "../models/uid.params";
 
 export class GetMessagesUseCase implements IUseCase {
   constructor(
-    private repository: MessageRepository,
+    private repository: IMessageRepository,
     private cacheRepository: ICacheRepository
   ) {}
 

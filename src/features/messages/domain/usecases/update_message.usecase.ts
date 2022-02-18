@@ -3,7 +3,7 @@ import { IUseCase } from "../../../../core/domain/contracts/usecase.contract";
 import { NotFoundFailure } from "../../../../core/domain/errors/errors";
 import { IMessageRepository } from "../contracts/message_repository.contract";
 import { UpdateMessageFailure } from "../errors/errors";
-import { IMessage } from "../models/mesage.model";
+import { IMessage } from "../models/message.model";
 import { UpdateMessageParams } from "../models/update_message.params";
 
 export class UpdateMessageUseCase implements IUseCase {

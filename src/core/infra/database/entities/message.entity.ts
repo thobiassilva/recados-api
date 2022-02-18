@@ -5,7 +5,7 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { IMessage } from "../../../../features/messages/domain/models/mesage.model";
+import { IMessage } from "../../../../features/messages/domain/models/message.model";
 
 @Entity()
 export class Message implements IMessage {

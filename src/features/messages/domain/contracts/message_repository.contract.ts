@@ -1,4 +1,4 @@
-import { IMessage } from "../models/mesage.model";
+import { IMessage } from "../models/message.model";
 
 export interface IMessageRepository {
   list(userUid: string): Promise<IMessage[]>;

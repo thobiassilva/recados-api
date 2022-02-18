@@ -3,7 +3,7 @@ import { ICacheRepository } from "../../../../core/domain/contracts/cache_reposi
 import { IUseCase } from "../../../../core/domain/contracts/usecase.contract";
 import { IMessageRepository } from "../contracts/message_repository.contract";
 import { CreateMessageParams } from "../models/create_message.params";
-import { IMessage } from "../models/mesage.model";
+import { IMessage } from "../models/message.model";
 
 export class CreateMessageUseCase implements IUseCase {
   constructor(
