@@ -2,7 +2,10 @@ import request from "supertest";
 import { DatabaseConnection } from "../../../../../src/core/infra/database/connections/connection";
 import { RedisConnection } from "../../../../../src/core/infra/database/connections/redis";
 import { Message, User } from "../../../../../src/core/infra/database/entities";
-import { UserEntityBuilder } from "../../../../core/infra/database/entities";
+import {
+  UserEntityBuilder,
+  MessageEntityBuilder,
+} from "../../../../core/infra/database/entities";
 import { createServer } from "../../../../../src/core/presentation/server/server";
 
 const makeUser = async () => {
@@ -10,14 +13,12 @@ const makeUser = async () => {
   return { user };
 };
 
-const makePayload = () => {
-  return {
-    title: "any_title",
-    detail: "any_detail",
-  };
+const makeMessage = async () => {
+  const message = await MessageEntityBuilder.init().builder();
+  return { message };
 };
 
-describe("CreateMessageController", () => {
+describe("DeleteMessageController", () => {
   let app: Express.Application | undefined = undefined;
 
   beforeAll(async () => {
@@ -34,30 +35,37 @@ describe("CreateMessageController", () => {
   });
 
   test("Deve retornar Forbidden (403) se nao informar o authorization ", async () => {
-    await request(app).post("/messages").send().expect(403);
+    const uid = "any_uid";
+    await request(app).delete(`/messages/${uid}`).send().expect(403);
   });
 
-  test("Deve retornar Bad Request (400) se nao informar os dados ", async () => {
+  test("Deve retornar Not Found (404) se nao encontrar uma message ", async () => {
     const { user } = await makeUser();
+    const uid = "";
     await request(app)
-      .post("/messages")
+      .delete(`/messages/${uid}`)
       .set({ authorization: user.uid })
       .send()
-      .expect(400);
+      .expect(404);
   });
 
   test("Deve retornar um ok", async () => {
     const { user } = await makeUser();
-    const payload = makePayload();
+    const { message } = await makeMessage();
+    const uid = message.uid;
     await request(app)
-      .post("/messages")
+      .delete(`/messages/${uid}`)
       .set({ authorization: user.uid })
-      .send(payload)
-      .expect(200)
-      .expect((response) => {
-        expect(response.body.data).toBeTruthy();
-        expect(response.body.data.title).toEqual(payload.title);
-        expect(response.body.data.detail).toEqual(payload.detail);
-      });
+      .send()
+      .expect(200);
   });
+
+  // test("Deve retornar Server Error (500) se ocorrer erro nao tratado", async () => {
+  //   const uid = "any_uid";
+  //   await request(app)
+  //     .delete(`/messages/${uid}`)
+  //     .set({ authorization: uid})
+  //     .send()
+  //     .expect(500);
+  // });
 });

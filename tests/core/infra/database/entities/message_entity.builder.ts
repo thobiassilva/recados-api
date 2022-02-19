@@ -6,7 +6,7 @@ export class MessageEntityBuilder {
   #uid = "any_uid";
   #title = "any_title";
   #detail = "any_detail";
-  #userUid = "any_userUid";
+  #userUid = "any_uid";
 
   static init(): MessageEntityBuilder {
     return new MessageEntityBuilder();

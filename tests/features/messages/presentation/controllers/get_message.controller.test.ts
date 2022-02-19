@@ -2,7 +2,10 @@ import request from "supertest";
 import { DatabaseConnection } from "../../../../../src/core/infra/database/connections/connection";
 import { RedisConnection } from "../../../../../src/core/infra/database/connections/redis";
 import { Message, User } from "../../../../../src/core/infra/database/entities";
-import { UserEntityBuilder } from "../../../../core/infra/database/entities";
+import {
+  UserEntityBuilder,
+  MessageEntityBuilder,
+} from "../../../../core/infra/database/entities";
 import { createServer } from "../../../../../src/core/presentation/server/server";
 
 const makeUser = async () => {
@@ -10,14 +13,12 @@ const makeUser = async () => {
   return { user };
 };
 
-const makePayload = () => {
-  return {
-    title: "any_title",
-    detail: "any_detail",
-  };
+const makeMessage = async () => {
+  const message = await MessageEntityBuilder.init().builder();
+  return { message };
 };
 
-describe("CreateMessageController", () => {
+describe("GetMessagesController", () => {
   let app: Express.Application | undefined = undefined;
 
   beforeAll(async () => {
@@ -34,30 +35,21 @@ describe("CreateMessageController", () => {
   });
 
   test("Deve retornar Forbidden (403) se nao informar o authorization ", async () => {
-    await request(app).post("/messages").send().expect(403);
-  });
-
-  test("Deve retornar Bad Request (400) se nao informar os dados ", async () => {
-    const { user } = await makeUser();
-    await request(app)
-      .post("/messages")
-      .set({ authorization: user.uid })
-      .send()
-      .expect(400);
+    await request(app).get("/messages").send().expect(403);
   });
 
   test("Deve retornar um ok", async () => {
     const { user } = await makeUser();
-    const payload = makePayload();
+    const { message } = await makeMessage();
     await request(app)
-      .post("/messages")
+      .get("/messages")
       .set({ authorization: user.uid })
-      .send(payload)
+      .send()
       .expect(200)
       .expect((response) => {
         expect(response.body.data).toBeTruthy();
-        expect(response.body.data.title).toEqual(payload.title);
-        expect(response.body.data.detail).toEqual(payload.detail);
+        expect(response.body.data[0].title).toEqual(message.title);
+        expect(response.body.data[0].detail).toEqual(message.detail);
       });
   });
 });

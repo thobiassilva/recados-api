@@ -28,8 +28,9 @@ export default {
   // An array of regexp pattern strings used to skip coverage collection
   coveragePathIgnorePatterns: [
     "\\\\node_modules\\\\",
-    "<rootDir>/src/core/infra/data/database/migrations",
-    "<rootDir>/tests/core/infra/data/database",
+    "<rootDir>/src/core/infra/database/migrations",
+    "<rootDir>/src/core/presentation/server",
+    "<rootDir>/tests/core/infra/database",
     "<rootDir>/src/main",
   ],
 

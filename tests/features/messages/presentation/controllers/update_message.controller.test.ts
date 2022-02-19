@@ -1,8 +1,11 @@
 import request from "supertest";
 import { DatabaseConnection } from "../../../../../src/core/infra/database/connections/connection";
 import { RedisConnection } from "../../../../../src/core/infra/database/connections/redis";
-import { Message, User } from "../../../../../src/core/infra/database/entities";
-import { UserEntityBuilder } from "../../../../core/infra/database/entities";
+import { User } from "../../../../../src/core/infra/database/entities/user.entity";
+import {
+  UserEntityBuilder,
+  MessageEntityBuilder,
+} from "../../../../core/infra/database/entities";
 import { createServer } from "../../../../../src/core/presentation/server/server";
 
 const makeUser = async () => {
@@ -10,14 +13,19 @@ const makeUser = async () => {
   return { user };
 };
 
+const makeMessage = async () => {
+  const message = await MessageEntityBuilder.init().builder();
+  return { message };
+};
+
 const makePayload = () => {
   return {
-    title: "any_title",
-    detail: "any_detail",
+    title: "any_title_updated",
+    detail: "any_detail_updated",
   };
 };
 
-describe("CreateMessageController", () => {
+describe("UpdateMessageController", () => {
   let app: Express.Application | undefined = undefined;
 
   beforeAll(async () => {
@@ -28,30 +36,45 @@ describe("CreateMessageController", () => {
 
   afterAll(async () => {
     await DatabaseConnection.getConnection().getRepository(User).clear();
-    await DatabaseConnection.getConnection().getRepository(Message).clear();
     await DatabaseConnection.closeConnection();
     RedisConnection.closeConnection();
   });
 
   test("Deve retornar Forbidden (403) se nao informar o authorization ", async () => {
-    await request(app).post("/messages").send().expect(403);
+    const uid = "any_uid";
+    await request(app).put(`/messages/${uid}`).send().expect(403);
   });
 
   test("Deve retornar Bad Request (400) se nao informar os dados ", async () => {
+    const uid = "any_uid";
     const { user } = await makeUser();
     await request(app)
-      .post("/messages")
+      .put(`/messages/${uid}`)
       .set({ authorization: user.uid })
       .send()
       .expect(400);
   });
 
-  test("Deve retornar um ok", async () => {
+  test("Deve retornar Not Found (404) se nao encontrar uma message", async () => {
     const { user } = await makeUser();
     const payload = makePayload();
+    const uid = "";
     await request(app)
-      .post("/messages")
+      .put(`/messages/${uid}`)
       .set({ authorization: user.uid })
+      .send(payload)
+      .expect(404);
+  });
+
+  test("Deve retornar um ok", async () => {
+    const { user } = await makeUser();
+    const { message } = await makeMessage();
+    const payload = makePayload();
+    const uid = message.uid;
+    await request(app)
+      .put(`/messages/${uid}`)
+      .set({ authorization: user.uid })
+
       .send(payload)
       .expect(200)
       .expect((response) => {
