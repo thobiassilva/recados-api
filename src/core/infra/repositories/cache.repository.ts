@@ -10,11 +10,7 @@ export class CacheRepository implements ICacheRepository {
   }
 
   async set(key: string, value: any): Promise<void> {
-    const result = await this.redis.set(key, JSON.stringify(value), "EX", 30);
-
-    if (result === null) {
-      throw new Error("Set error");
-    }
+   await this.redis.set(key, JSON.stringify(value), "EX", 30);
   }
 
   async get<T>(key: string): Promise<T> {
