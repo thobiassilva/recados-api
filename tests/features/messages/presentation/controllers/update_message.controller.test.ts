@@ -1,12 +1,13 @@
-import request from "supertest";
-import { DatabaseConnection } from "../../../../../src/core/infra/database/connections/connection";
-import { RedisConnection } from "../../../../../src/core/infra/database/connections/redis";
-import { User } from "../../../../../src/core/infra/database/entities/user.entity";
+import request from 'supertest';
+import { DatabaseConnection } from '../../../../../src/core/infra/database/connections/connection';
+import { RedisConnection } from '../../../../../src/core/infra/database/connections/redis';
+import { User } from '../../../../../src/core/infra/database/entities/user.entity';
 import {
   UserEntityBuilder,
   MessageEntityBuilder,
-} from "../../../../core/infra/database/entities";
-import { createServer } from "../../../../../src/core/presentation/server/server";
+} from '../../../../core/infra/database/entities';
+import { createServer } from '../../../../../src/core/presentation/server/server';
+import { UpdateMessageUseCase } from '../../../../../src/features/messages/domain/usecases/update_message.usecase';
 
 const makeUser = async () => {
   const user = await UserEntityBuilder.init().builder();
@@ -20,12 +21,12 @@ const makeMessage = async () => {
 
 const makePayload = () => {
   return {
-    title: "any_title_updated",
-    detail: "any_detail_updated",
+    title: 'any_title_updated',
+    detail: 'any_detail_updated',
   };
 };
 
-describe("UpdateMessageController", () => {
+describe('UpdateMessageController', () => {
   let app: Express.Application | undefined = undefined;
 
   beforeAll(async () => {
@@ -40,13 +41,13 @@ describe("UpdateMessageController", () => {
     RedisConnection.closeConnection();
   });
 
-  test("Deve retornar Forbidden (403) se nao informar o authorization ", async () => {
-    const uid = "any_uid";
+  test('Deve retornar Forbidden (403) se nao informar o authorization ', async () => {
+    const uid = 'any_uid';
     await request(app).put(`/messages/${uid}`).send().expect(403);
   });
 
-  test("Deve retornar Bad Request (400) se nao informar os dados ", async () => {
-    const uid = "any_uid";
+  test('Deve retornar Bad Request (400) se nao informar os dados ', async () => {
+    const uid = 'any_uid';
     const { user } = await makeUser();
     await request(app)
       .put(`/messages/${uid}`)
@@ -55,10 +56,10 @@ describe("UpdateMessageController", () => {
       .expect(400);
   });
 
-  test("Deve retornar Not Found (404) se nao encontrar uma message", async () => {
+  test('Deve retornar Not Found (404) se nao encontrar uma message', async () => {
     const { user } = await makeUser();
     const payload = makePayload();
-    const uid = "";
+    const uid = '';
     await request(app)
       .put(`/messages/${uid}`)
       .set({ authorization: user.uid })
@@ -66,7 +67,7 @@ describe("UpdateMessageController", () => {
       .expect(404);
   });
 
-  test("Deve retornar um ok", async () => {
+  test('Deve retornar um ok', async () => {
     const { user } = await makeUser();
     const { message } = await makeMessage();
     const payload = makePayload();
@@ -82,5 +83,28 @@ describe("UpdateMessageController", () => {
         expect(response.body.data.title).toEqual(payload.title);
         expect(response.body.data.detail).toEqual(payload.detail);
       });
+  });
+
+  test('Deve retornar Server Error (500) se ocorrer erro nao tratado', async () => {
+    const { user } = await makeUser();
+    const { message } = await makeMessage();
+    const payload = makePayload();
+    const uid = message.uid;
+
+    jest.mock(
+      '../../../../../src/features/messages/domain/usecases/update_message.usecase'
+    );
+
+    jest
+      .spyOn(UpdateMessageUseCase.prototype, 'execute')
+      .mockRejectedValue(null);
+
+    await request(app)
+      .put(`/messages/${uid}`)
+      .set({ authorization: user.uid })
+      .send(payload)
+      .expect(500);
+
+    jest.restoreAllMocks();
   });
 });

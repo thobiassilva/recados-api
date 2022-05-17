@@ -7,6 +7,7 @@ import {
   MessageEntityBuilder,
 } from "../../../../core/infra/database/entities";
 import { createServer } from "../../../../../src/core/presentation/server/server";
+import { DeleteMessageUseCase } from "../../../../../src/features/messages/domain/usecases/delete_message.usecase";
 
 const makeUser = async () => {
   const user = await UserEntityBuilder.init().builder();
@@ -60,12 +61,23 @@ describe("DeleteMessageController", () => {
       .expect(200);
   });
 
-  // test("Deve retornar Server Error (500) se ocorrer erro nao tratado", async () => {
-  //   const uid = "any_uid";
-  //   await request(app)
-  //     .delete(`/messages/${uid}`)
-  //     .set({ authorization: uid})
-  //     .send()
-  //     .expect(500);
-  // });
+
+
+  test("Deve retornar Server Error (500) se ocorrer erro nao tratado", async () => {
+    const { user } = await makeUser();
+    const { message } = await makeMessage();
+    const uid = message.uid;
+
+    jest.mock('../../../../../src/features/messages/domain/usecases/delete_message.usecase');
+
+    jest.spyOn(DeleteMessageUseCase.prototype, 'execute').mockRejectedValue(null);
+
+    await request(app)
+      .delete(`/messages/${uid}`)
+      .set({ authorization: user.uid })
+      .send()
+      .expect(500);
+
+      jest.restoreAllMocks();
+  });
 });
