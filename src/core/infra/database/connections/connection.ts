@@ -4,11 +4,11 @@ export class DatabaseConnection {
   private static _connection: Connection;
 
   static getConnection() {
-    let conn = getConnection();
+    // let conn = getConnection();
 
-    if (!conn) {
-      throw new Error("Database is not connected.");
-    }
+    // if (!conn) {
+    //   throw new Error("Database is not connected.");
+    // }
 
     return DatabaseConnection._connection;
   }
