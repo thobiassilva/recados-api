@@ -1,8 +1,8 @@
 import { IUserRepository } from "../../../../../src/core/domain/contracts/user_repository.contract";
 import { IUser } from "../../../../../src/core/domain/models/user.model";
 import { UserAlreadyExistsFailure } from "../../../../../src/features/authentication/domain/errors/errors";
-import { RegisterParams } from "../../../../../src/features/authentication/domain/models/";
-import { RegisterUseCase } from "../../../../../src/features/authentication/domain/usecases";
+import { RegisterParams } from "../../../../../src/features/authentication/domain/models/register.params";
+import { RegisterUseCase } from "../../../../../src/features/authentication/domain/usecases/register.usecase";
 import { UserBuilder } from "../../../../builders/user.builder";
 
 const mockUserRepository = (): IUserRepository => {

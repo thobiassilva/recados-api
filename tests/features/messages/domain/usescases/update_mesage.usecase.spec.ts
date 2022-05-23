@@ -1,7 +1,9 @@
 import {
-  CreateMessageUseCase,
   UpdateMessageUseCase,
-} from "../../../../../src/features/messages/domain/usecases";
+} from "../../../../../src/features/messages/domain/usecases/update_message.usecase";
+import {
+  CreateMessageUseCase
+} from "../../../../../src/features/messages/domain/usecases/create_message.usecase";
 import { IMessageRepository } from "../../../../../src/features/messages/domain/contracts/message_repository.contract";
 import { IMessage } from "../../../../../src/features/messages/domain/models/message.model";
 import { MessageBuilder } from "../../../../builders/";

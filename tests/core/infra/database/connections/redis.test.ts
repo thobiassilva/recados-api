@@ -1,7 +1,8 @@
 import request from 'supertest';
 import { DatabaseConnection } from '../../../../../src/core/infra/database/connections/connection';
 import { RedisConnection } from '../../../../../src/core/infra/database/connections/redis';
-import { Message, User } from '../../../../../src/core/infra/database/entities';
+import { Message } from '../../../../../src/core/infra/database/entities/message.entity';
+import { User } from '../../../../../src/core/infra/database/entities/user.entity';
 import {
   UserEntityBuilder,
   MessageEntityBuilder,

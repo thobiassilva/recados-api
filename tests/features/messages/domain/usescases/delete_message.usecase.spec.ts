@@ -1,4 +1,4 @@
-import { DeleteMessageUseCase } from "../../../../../src/features/messages/domain/usecases";
+import { DeleteMessageUseCase } from "../../../../../src/features/messages/domain/usecases/delete_message.usecase";
 import { IMessageRepository } from "../../../../../src/features/messages/domain/contracts/message_repository.contract";
 import { IMessage } from "../../../../../src/features/messages/domain/models/message.model";
 import { MessageBuilder } from "../../../../builders/";

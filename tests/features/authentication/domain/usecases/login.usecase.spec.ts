@@ -2,8 +2,8 @@ import { IUserRepository } from "../../../../../src/core/domain/contracts/user_r
 import { NotFoundFailure } from "../../../../../src/core/domain/errors/errors";
 import { IUser } from "../../../../../src/core/domain/models/user.model";
 import { InvalidCredentialsFailure } from "../../../../../src/features/authentication/domain/errors/errors";
-import { LoginParams } from "../../../../../src/features/authentication/domain/models";
-import { LoginUseCase } from "../../../../../src/features/authentication/domain/usecases";
+import { LoginParams } from "../../../../../src/features/authentication/domain/models/login.params";
+import { LoginUseCase } from "../../../../../src/features/authentication/domain/usecases/login.usecase";
 import { UserBuilder } from "../../../../builders/user.builder";
 
 const mockUserRepository = (): IUserRepository => {
