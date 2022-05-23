@@ -17,7 +17,7 @@ import express from "express";
 import cors from "cors";
 import { makeRoutes } from "../routes/routes";
 import SwaggerUI from 'swagger-ui-express';
-import swaggerTsConfig from '../../../../swagger';
+import swaggerTsConfig from '../../../swagger';
 
 export const createServer = () => {
   const app = express();
