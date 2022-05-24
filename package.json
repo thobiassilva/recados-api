@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only ./src/main.ts",
     "postinstall": "npx tsc",
-    "start": "cross-env NODE_ENV=production node ./dist/main.js",
+    "start": "cross-env NODE_ENV=prod node ./dist/main.js",
     "build": "yarn rimraf dist && yarn tsc",
     "migration:run": "yarn ts-node-dev ./node_modules/typeorm/cli.js migration:run",
     "migration:generate": "yarn ts-node-dev ./node_modules/typeorm/cli.js migration:generate",
